@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixWork – Founder Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <h1>Fix<span>Work</span></h1>
+    <p>🛡 Founder Panel</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <button class="nav-item active" onclick="showPanel('overview', this)">
+      <span class="nav-icon">📊</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPanel('activity', this)">
+      <span class="nav-icon">🕐</span> Activity Log
+    </button>
+
+    <div class="nav-section-label">Users</div>
+    <button class="nav-item" onclick="showPanel('clients', this)">
+      <span class="nav-icon">👥</span> Clients
+      <span class="nav-badge" id="clientBadge">0</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('workers', this)">
+      <span class="nav-icon">🔧</span> Workers
+      <span class="nav-badge" id="workerBadge" style="background:var(--blue);">0</span>
+    </button>
+    <button class="nav-item" onclick="showPanel('blocked', this)">
+      <span class="nav-icon">🚫</span> Blocked
+      <span class="nav-badge" id="blockedBadge" style="background:var(--muted);">0</span>
+    </button>
+
+    <div class="nav-section-label">Content</div>
+    <button class="nav-item" onclick="showPanel('posts', this)">
+      <span class="nav-icon">📝</span> Posts & Media
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="founder-badge">
+      <div class="founder-avatar">F</div>
+      <div class="founder-info">
+        <strong>Founder</strong>
+        <span>⭐ Admin Access</span>
+      </div>
+    </div>
+    <button class="btn-logout" onclick="adminLogout()">← Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-title" id="topbarTitle">Dashboard</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-stat"><div class="live-dot"></div> Live</div>
+      <div class="topbar-stat">Users: <strong id="topTotalUsers">0</strong></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ── OVERVIEW PANEL ── -->
+    <div class="panel active" id="panel-overview">
+      <div class="stats-row">
+        <div class="stat-card blue" style="animation-delay:0s">
+          <div class="stat-card-icon">👥</div>
+          <div class="stat-card-label">Total Users</div>
+          <div class="stat-card-value" id="stat-total">0</div>
+          <div class="stat-card-sub">All registered accounts</div>
+        </div>
+        <div class="stat-card green" style="animation-delay:0.08s">
+          <div class="stat-card-icon">🧑‍💼</div>
+          <div class="stat-card-label">Clients</div>
+          <div class="stat-card-value" id="stat-clients">0</div>
+          <div class="stat-card-sub">Looking for workers</div>
+        </div>
+        <div class="stat-card gold" style="animation-delay:0.16s">
+          <div class="stat-card-icon">🔧</div>
+          <div class="stat-card-label">Workers</div>
+          <div class="stat-card-value" id="stat-workers">0</div>
+          <div class="stat-card-sub">Offering services</div>
+        </div>
+        <div class="stat-card red" style="animation-delay:0.24s">
+          <div class="stat-card-icon">🚫</div>
+          <div class="stat-card-label">Blocked</div>
+          <div class="stat-card-value" id="stat-blocked">0</div>
+          <div class="stat-card-sub">Suspended accounts</div>
+        </div>
+      </div>
+
+      <div class="overview-grid">
+        <div class="overview-card">
+          <h4>⭐ Top Rated Workers</h4>
+          <div class="mini-list" id="topWorkersList">
+            <p style="color:var(--muted);font-size:13px;">No workers yet.</p>
+          </div>
+        </div>
+        <div class="overview-card">
+          <h4>🆕 Recent Sign-ups</h4>
+          <div class="mini-list" id="recentSignupsList">
+            <p style="color:var(--muted);font-size:13px;">No users yet.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="overviewTable">
+            <tr class="empty-row"><td colspan="4">No users registered yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── CLIENTS PANEL ── -->
+    <div class="panel" id="panel-clients">
+      <div class="section-header">
+        <div class="section-title">👥 Clients</div>
+      </div>
+      <div class="filter-row">
+        <input class="search-input" type="text" placeholder="🔍  Search clients by name or email…" oninput="filterTable('clients', this.value)">
+      </div>
+      <div class="table-wrap">
+        <table class="user-table">
+          <thead>
+            <tr><th>User</th><th>Email</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="clientsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── WORKERS PANEL ── -->
+    <div class="panel" id="panel-workers">
+      <div class="section-header">
+        <div class="section-title">🔧 Workers</div>
+      </div>
+      <div class="filter-row">
+        <input class="search-input" type="text" placeholder="🔍  Search workers by name, role or location…" oninput="filterTable('workers', this.value)">
+      </div>
+      <div class="table-wrap">
+        <table class="user-table">
+          <thead>
+            <tr><th>Worker</th><th>Role / Location</th><th>Rating</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="workersTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── BLOCKED PANEL ── -->
+    <div class="panel" id="panel-blocked">
+      <div class="section-header">
+        <div class="section-title">🚫 Blocked Accounts</div>
+      </div>
+      <div class="table-wrap">
+        <table class="user-table">
+          <thead>
+            <tr><th>User</th><th>Role</th><th>Reason</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="blockedTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── POSTS PANEL ── -->
+    <div class="panel" id="panel-posts">
+      <div class="section-header">
+        <div class="section-title">📝 Posts & Media</div>
+      </div>
+      <div class="table-wrap">
+        <table class="user-table">
+          <thead>
+            <tr><th>Author</th><th>Caption</th><th>Media</th><th>Date</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="postsTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ACTIVITY PANEL ── -->
+    <div class="panel" id="panel-activity">
+      <div class="section-header">
+        <div class="section-title">🕐 Activity Log</div>
+        <button class="tab-btn" onclick="clearLog()">Clear Log</button>
+      </div>
+      <div class="table-wrap">
+        <div class="activity-list" id="activityList">
+          <div style="padding:40px;text-align:center;color:var(--muted);font-size:14px;">No activity recorded yet.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- USER DETAIL MODAL -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeUserModal()">✕</button>
+      <div class="modal-avatar" id="modalAvi"></div>
+      <div class="modal-name"     id="modalName"></div>
+      <div class="modal-role-loc" id="modalRoleLoc"></div>
+    </div>
+    <div class="modal-body">
+      <div id="modalDetails"></div>
+      <div class="modal-actions-row">
+        <button class="btn-modal-block" id="modalBlockBtn">🚫 Block User</button>
+        <button class="btn-modal-close" onclick="closeUserModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="confirm-modal">
+    <div class="confirm-icon" id="confirmIcon">⚠️</div>
+    <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+    <p class="confirm-text" id="confirmText">This action cannot be undone.</p>
+    <div class="confirm-btns">
+      <button class="btn-confirm-yes" id="confirmYes">Confirm</button>
+      <button class="btn-confirm-no" onclick="closeConfirm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>

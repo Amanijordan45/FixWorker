@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixWork – Find Trusted Workers Near You</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --blue:    #1a56db;
+  --blue-lt: #3b82f6;
+  --accent:  #06b6d4;
+  --gold:    #f59e0b;
+  --green:   #10b981;
+  --bg:      #070b13;
+  --bg2:     #0b1120;
+  --card:    rgba(255,255,255,0.04);
+  --border:  rgba(255,255,255,0.08);
+  --text:    #f1f5f9;
+  --muted:   rgba(255,255,255,0.45);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+a { text-decoration: none; color: inherit; }
+.container { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, var(--blue), var(--accent));
+  color: white; padding: 15px 30px; border-radius: 50px;
+  font-weight: 700; font-size: 15px; transition: 0.3s cubic-bezier(0.16,1,0.3,1);
+  box-shadow: 0 4px 24px rgba(26,86,219,0.45); position: relative; overflow: hidden;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(26,86,219,0.55); }
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.07); color: var(--text);
+  padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 15px;
+  border: 1px solid var(--border); transition: 0.3s; backdrop-filter: blur(8px);
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+.btn-ghost { display: inline-flex; align-items: center; color: var(--muted); padding: 10px 20px; border-radius: 50px; font-weight: 500; font-size: 14px; transition: 0.2s; }
+.btn-ghost:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.btn-solid { display: inline-flex; align-items: center; background: var(--blue); color: white; padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: 14px; transition: 0.2s; }
+.btn-solid:hover { background: #1e429f; transform: translateY(-1px); }
+.btn-ghost-white { display: inline-flex; align-items: center; color: rgba(255,255,255,0.7); padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 15px; border: 1.5px solid rgba(255,255,255,0.2); transition: 0.3s; }
+.btn-ghost-white:hover { background: rgba(255,255,255,0.08); color: white; }
+
+/* ── NAV ── */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+  transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+  border-bottom: 1px solid transparent;
+}
+.nav.scrolled {
+  background: rgba(7,11,19,0.94); backdrop-filter: blur(20px);
+  border-color: var(--border); box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+}
+.nav-inner {
+  max-width: 1120px; margin: 0 auto; padding: 0 28px;
+  height: 68px; display: flex; align-items: center; gap: 36px;
+}
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: white; flex-shrink: 0; letter-spacing: -0.5px; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 32px; flex: 1; }
+.nav-links a { font-size: 14px; font-weight: 500; color: var(--muted); transition: color 0.2s; }
+.nav-links a:hover { color: white; }
+.nav-actions { display: flex; align-items: center; gap: 8px; }
+.hamburger { display: none; background: none; border: none; font-size: 22px; cursor: pointer; margin-left: auto; color: var(--text); }
+.mobile-menu { display: none; flex-direction: column; padding: 16px 28px 24px; gap: 14px; background: rgba(7,11,19,0.98); backdrop-filter: blur(20px); border-top: 1px solid var(--border); }
+.mobile-menu.open { display: flex; }
+.mobile-menu a { font-size: 15px; font-weight: 500; color: var(--muted); transition: color 0.2s; }
+.mobile-menu a:hover { color: white; }
+@media (max-width: 768px) { .nav-links, .nav-actions { display: none; } .hamburger { display: block; } }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh; background: var(--bg);
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden; padding-top: 68px;
+}
+.hero-bg { position: absolute; inset: 0; pointer-events: none; }
+.blob { position: absolute; border-radius: 50%; filter: blur(100px); }
+.blob-1 { width: 700px; height: 700px; background: radial-gradient(circle, rgba(26,86,219,0.28), rgba(6,182,212,0.12)); top: -200px; right: -100px; animation: blobFloat 10s ease-in-out infinite; }
+.blob-2 { width: 450px; height: 450px; background: radial-gradient(circle, rgba(6,182,212,0.16), rgba(139,92,246,0.08)); bottom: 60px; left: -100px; animation: blobFloat 13s ease-in-out infinite reverse; }
+@keyframes blobFloat { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(20px,-30px) scale(1.05)} 66%{transform:translate(-15px,15px) scale(0.97)} }
+
+/* Animated grid */
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridScroll 20s linear infinite;
+}
+@keyframes gridScroll { from{background-position:0 0} to{background-position:60px 60px} }
+
+.hero-inner {
+  position: relative; z-index: 1;
+  max-width: 1120px; margin: 0 auto;
+  padding: 80px 28px 130px;
+  display: flex; align-items: center; gap: 60px;
+}
+.hero-text { flex: 1; min-width: 0; }
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(26,86,219,0.15); border: 1px solid rgba(26,86,219,0.3);
+  border-radius: 50px; padding: 6px 18px;
+  font-size: 12px; font-weight: 700; color: var(--accent);
+  margin-bottom: 28px; letter-spacing: 1px; text-transform: uppercase;
+  animation: fadeSlideUp 0.6s ease both;
+}
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(46px, 6vw, 80px);
+  font-weight: 800; line-height: 1.0; letter-spacing: -3px;
+  color: white; margin-bottom: 24px;
+  animation: fadeSlideUp 0.6s ease 0.1s both;
+}
+.highlight {
+  color: transparent;
+  background: linear-gradient(135deg, var(--blue-lt), var(--accent));
+  -webkit-background-clip: text; background-clip: text;
+}
+/* Typewriter word cycle */
+.type-cycle { display: inline-block; min-width: 280px; }
+.type-cycle .word { display: none; }
+.type-cycle .word.active { display: inline; }
+
+.hero-desc {
+  font-size: 17px; color: var(--muted); line-height: 1.8;
+  max-width: 500px; margin-bottom: 38px; font-weight: 400;
+  animation: fadeSlideUp 0.6s ease 0.2s both;
+}
+.hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px; animation: fadeSlideUp 0.6s ease 0.3s both; }
+.hero-stats { display: flex; align-items: center; gap: 28px; animation: fadeSlideUp 0.6s ease 0.4s both; }
+.stat { text-align: left; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: white; line-height: 1; }
+.stat span { font-size: 22px; font-weight: 700; color: var(--accent); }
+.stat p { font-size: 12px; color: var(--muted); font-weight: 500; margin-top: 3px; letter-spacing: 0.3px; }
+.stat-div { width: 1px; height: 44px; background: var(--border); }
+
+/* ── PHONE MOCKUP ── */
+.hero-visual { flex-shrink: 0; display: flex; justify-content: center; position: relative; animation: fadeSlideUp 0.8s ease 0.2s both; }
+.phone-mockup { position: relative; animation: phoneFloat 6s ease-in-out infinite; }
+@keyframes phoneFloat { 0%,100%{transform:translateY(0) rotate(0.5deg)} 50%{transform:translateY(-18px) rotate(-0.5deg)} }
+.phone-screen {
+  width: 280px; background: #0b1120; border-radius: 38px;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1), 0 40px 80px rgba(0,0,0,0.6), 0 0 100px rgba(26,86,219,0.25);
+  overflow: hidden; border: 2px solid rgba(255,255,255,0.08);
+}
+.phone-topbar { background: linear-gradient(135deg, var(--blue), #1e429f); padding: 16px 16px 14px; display: flex; justify-content: space-between; align-items: center; }
+.phone-logo { color: white; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 17px; letter-spacing: -0.5px; }
+.phone-notif { font-size: 16px; }
+.phone-search { margin: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px 12px; font-size: 12px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 6px; }
+.phone-cards { padding: 0 12px 8px; display: flex; flex-direction: column; gap: 8px; }
+.phone-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 10px; display: flex; align-items: center; gap: 10px; }
+.phone-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+.phone-info { flex: 1; min-width: 0; }
+.phone-info strong { display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.phone-info span { font-size: 10px; color: rgba(255,255,255,0.4); }
+.phone-stars { font-size: 10px; color: var(--gold); flex-shrink: 0; }
+.phone-cta { margin: 12px; background: linear-gradient(135deg, var(--blue), var(--accent)); color: white; text-align: center; padding: 11px; border-radius: 12px; font-size: 13px; font-weight: 700; }
+
+/* Floating badges */
+.float-badge { position: absolute; background: rgba(11,17,32,0.92); border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(12px); border-radius: 50px; padding: 9px 18px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.88); box-shadow: 0 8px 28px rgba(0,0,0,0.45); white-space: nowrap; }
+.float-badge-1 { top: 14px; right: -90px; animation: badgePop 4s ease-in-out infinite; }
+.float-badge-2 { bottom: 90px; right: -100px; animation: badgePop 4s ease-in-out infinite 1.3s; }
+.float-badge-3 { bottom: 18px; left: -90px; animation: badgePop 4s ease-in-out infinite 2.6s; }
+@keyframes badgePop { 0%,100%{transform:scale(1) translateY(0)} 50%{transform:scale(1.06) translateY(-4px)} }
+
+.hero-wave { position: absolute; bottom: 0; left: 0; right: 0; line-height: 0; }
+.hero-wave svg { width: 100%; height: 80px; display: block; }
+
+@keyframes fadeSlideUp { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── SCROLL TICKER ── */
+.ticker-wrap {
+  background: var(--blue); overflow: hidden;
+  padding: 13px 0; white-space: nowrap;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.ticker-inner { display: inline-flex; animation: tickerScroll 30s linear infinite; }
+.ticker-item {
+  display: inline-flex; align-items: center; gap: 14px;
+  padding: 0 40px; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.85); letter-spacing: 0.3px;
+}
+.ticker-dot { width: 5px; height: 5px; background: rgba(255,255,255,0.5); border-radius: 50%; }
+@keyframes tickerScroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+/* ── SOCIAL PROOF / TRUST BAR ── */
+.trust-bar {
+  background: var(--bg2); padding: 56px 0;
+  border-bottom: 1px solid var(--border);
+}
+.trust-bar .section-label { text-align: center; margin-bottom: 36px; }
+.trust-numbers {
+  display: flex; justify-content: center; flex-wrap: wrap;
+  gap: 0;
+}
+.trust-num-item {
+  text-align: center; padding: 16px 52px;
+  border-right: 1px solid var(--border);
+}
+.trust-num-item:last-child { border-right: none; }
+.trust-big { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; line-height: 1; }
+.trust-big.blue { color: var(--blue-lt); }
+.trust-big.cyan { color: var(--accent); }
+.trust-big.gold { color: var(--gold); }
+.trust-big.green { color: var(--green); }
+.trust-label { font-size: 13px; color: var(--muted); font-weight: 500; margin-top: 6px; letter-spacing: 0.3px; }
+
+/* ── CATEGORIES ── */
+.categories { background: var(--bg2); padding: 56px 0; border-bottom: 1px solid var(--border); }
+.categories .section-label { text-align: center; margin-bottom: 28px; }
+.cat-grid { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.cat-item {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--card); border: 1px solid var(--border); border-radius: 50px;
+  padding: 11px 22px; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: var(--muted); transition: 0.25s;
+}
+.cat-item:hover { border-color: var(--accent); color: var(--accent); background: rgba(6,182,212,0.08); transform: translateY(-2px); }
+.cat-icon { font-size: 18px; }
+
+/* ── VISUAL SHOWCASE ── */
+.showcase {
+  padding: 110px 0; background: var(--bg); position: relative; overflow: hidden;
+}
+.showcase-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+  margin-top: 64px;
+}
+.showcase-main {
+  grid-row: span 2;
+  border-radius: 24px; overflow: hidden; position: relative;
+  background: linear-gradient(135deg, #0d1a35 0%, #091525 100%);
+  border: 1px solid var(--border); min-height: 460px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 32px;
+  transition: transform 0.4s, box-shadow 0.4s;
+}
+.showcase-main:hover { transform: scale(1.01); box-shadow: 0 32px 80px rgba(0,0,0,0.5); }
+.showcase-main .bg-visual {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 400px 400px at 60% 30%, rgba(26,86,219,0.3) 0%, transparent 70%),
+    radial-gradient(ellipse 300px 300px at 20% 70%, rgba(6,182,212,0.2) 0%, transparent 70%);
+}
+.showcase-worker-cards {
+  position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; gap: 10px; width: 85%;
+}
+.sw-card {
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  backdrop-filter: blur(8px); transition: 0.3s;
+}
+.sw-card:hover { background: rgba(255,255,255,0.12); transform: translateX(4px); }
+.sw-av {
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px; color: white; flex-shrink: 0;
+}
+.sw-info { flex: 1; }
+.sw-info strong { display: block; font-size: 13px; font-weight: 600; color: white; }
+.sw-info span { font-size: 11px; color: rgba(255,255,255,0.4); }
+.sw-rating { font-size: 11px; color: var(--gold); white-space: nowrap; }
+.sw-badge { font-size: 10px; background: rgba(16,185,129,0.2); color: var(--green); border-radius: 20px; padding: 2px 8px; font-weight: 600; }
+.showcase-label {
+  position: relative; z-index: 2;
+}
+.showcase-label h3 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: white; margin-bottom: 8px; letter-spacing: -0.5px; }
+.showcase-label p { font-size: 14px; color: var(--muted); }
+
+.showcase-small {
+  border-radius: 24px; overflow: hidden; position: relative;
+  border: 1px solid var(--border); padding: 28px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  min-height: 210px; transition: transform 0.4s, box-shadow 0.4s;
+}
+.showcase-small:hover { transform: scale(1.01); box-shadow: 0 24px 60px rgba(0,0,0,0.4); }
+.sc-dark { background: linear-gradient(135deg, #0d1a2e, #0a1422); }
+.sc-teal { background: linear-gradient(135deg, #041d26, #062030); }
+.sc-accent { position: absolute; inset: 0; pointer-events: none; }
+.sc-icon { font-size: 40px; margin-bottom: 12px; }
+.sc-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: white; margin-bottom: 6px; }
+.sc-sub { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.sc-stat { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 800; color: var(--accent); }
+.sc-stat-label { font-size: 12px; color: var(--muted); }
+
+/* Mini activity feed */
+.mini-feed { display: flex; flex-direction: column; gap: 8px; }
+.mini-feed-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: rgba(255,255,255,0.6); }
+.mini-feed-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── HOW IT WORKS - Visual ── */
+.how {
+  background: var(--bg2); padding: 110px 0; position: relative;
+  overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.how-bg { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 40px 40px; }
+.how-inner { position: relative; z-index: 1; }
+.steps { display: flex; align-items: stretch; gap: 0; margin-bottom: 56px; }
+.step {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 0;
+  padding: 36px 30px; flex: 1; min-width: 200px;
+  transition: transform 0.3s, background 0.3s; position: relative; overflow: hidden;
+}
+.step:first-child { border-radius: 20px 0 0 20px; }
+.step:last-child { border-radius: 0 20px 20px 0; }
+.step::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--blue), var(--accent)); opacity: 0; transition: opacity 0.3s; }
+.step:hover { background: rgba(255,255,255,0.06); transform: translateY(-5px); }
+.step:hover::before { opacity: 1; }
+.step-num { font-family: 'Syne', sans-serif; font-size: 52px; font-weight: 800; color: rgba(255,255,255,0.06); margin-bottom: 16px; line-height: 1; }
+.step-icon { font-size: 32px; margin-bottom: 14px; }
+.step-body h3 { font-size: 18px; color: white; margin-bottom: 10px; font-family: 'Syne', sans-serif; font-weight: 700; }
+.step-body p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+.step-connector { width: 0; position: relative; display: flex; align-items: center; z-index: 2; }
+.step-connector::after { content: '→'; position: absolute; left: -18px; font-size: 28px; color: rgba(255,255,255,0.12); font-family: 'Syne', sans-serif; }
+.how-cta { text-align: center; }
+
+/* ── FEATURES ── */
+.features { padding: 110px 0; background: var(--bg); position: relative; }
+.features::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 800px 600px at 50% 50%, rgba(26,86,219,0.05) 0%, transparent 70%); pointer-events: none; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 20px; }
+.feature-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 32px;
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), box-shadow 0.35s, border-color 0.35s;
+  position: relative; overflow: hidden;
+}
+.feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); }
+.feature-card:hover { transform: translateY(-8px); box-shadow: 0 24px 56px rgba(0,0,0,0.35); border-color: rgba(26,86,219,0.4); }
+.feature-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 22px; border: 1px solid rgba(255,255,255,0.08); }
+.feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: white; font-family: 'Syne', sans-serif; letter-spacing: -0.3px; }
+.feature-card p { font-size: 14px; color: var(--muted); line-height: 1.8; }
+
+/* ── WORKER SHOWCASE STRIP ── */
+.workers-strip { padding: 100px 0; background: var(--bg2); overflow: hidden; border-top: 1px solid var(--border); }
+.workers-carousel { margin-top: 52px; overflow: hidden; position: relative; }
+.workers-carousel::before, .workers-carousel::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2; pointer-events: none;
+}
+.workers-carousel::before { left: 0; background: linear-gradient(90deg, var(--bg2), transparent); }
+.workers-carousel::after  { right: 0; background: linear-gradient(-90deg, var(--bg2), transparent); }
+.workers-track { display: flex; gap: 20px; animation: carouselScroll 32s linear infinite; width: max-content; }
+.workers-track:hover { animation-play-state: paused; }
+@keyframes carouselScroll { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.wc-card {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+  border-radius: 20px; padding: 24px; width: 220px; flex-shrink: 0;
+  transition: transform 0.3s, border-color 0.3s, background 0.3s;
+  cursor: pointer;
+}
+.wc-card:hover { transform: translateY(-6px); border-color: rgba(26,86,219,0.4); background: rgba(26,86,219,0.06); }
+.wc-av { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 700; margin-bottom: 14px; }
+.wc-name { font-size: 15px; font-weight: 700; color: white; margin-bottom: 4px; }
+.wc-role { font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 8px; }
+.wc-loc { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+.wc-stars { font-size: 12px; color: var(--gold); margin-bottom: 4px; }
+.wc-reviews { font-size: 11px; color: var(--muted); }
+
+/* ── TESTIMONIALS ── */
+.testimonials { padding: 110px 0; background: var(--bg); }
+.testi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 20px; }
+.testi-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+  padding: 28px; transition: transform 0.3s, box-shadow 0.3s;
+  display: flex; flex-direction: column; gap: 16px; position: relative; overflow: hidden;
+}
+.testi-card::before { content: '"'; position: absolute; top: 16px; right: 20px; font-family: 'Syne', sans-serif; font-size: 80px; color: rgba(26,86,219,0.12); line-height: 1; }
+.testi-card:hover { transform: translateY(-6px); box-shadow: 0 24px 52px rgba(0,0,0,0.35); }
+.testi-stars { color: var(--gold); font-size: 15px; letter-spacing: 2px; }
+.testi-text { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.85; flex: 1; }
+.testi-author { display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid var(--border); }
+.testi-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.testi-author strong { display: block; font-size: 14px; font-weight: 600; color: white; }
+.testi-author span { font-size: 12px; color: var(--muted); }
+
+/* ── VIDEO / IMMERSIVE SECTION ── */
+.immersive {
+  position: relative; padding: 120px 0; background: var(--bg);
+  border-top: 1px solid var(--border); overflow: hidden;
+}
+.immersive-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 600px 600px at 0% 50%, rgba(26,86,219,0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 100% 50%, rgba(6,182,212,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.immersive-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 80px; }
+.immersive-text { flex: 1; }
+.immersive-text h2 { font-family: 'Syne', sans-serif; font-size: clamp(32px, 4vw, 50px); font-weight: 800; letter-spacing: -2px; color: white; line-height: 1.1; margin-bottom: 20px; }
+.immersive-text p { font-size: 16px; color: var(--muted); line-height: 1.85; margin-bottom: 32px; }
+.immersive-checklist { display: flex; flex-direction: column; gap: 14px; margin-bottom: 36px; }
+.check-item { display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+.check-icon { width: 24px; height: 24px; border-radius: 50%; background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 12px; color: var(--green); margin-top: 0px; }
+.immersive-visual { flex-shrink: 0; width: 480px; }
+.dashboard-mockup {
+  background: #0b1120; border: 1px solid var(--border);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 80px rgba(26,86,219,0.15);
+}
+.dash-topbar { background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; align-items: center; gap: 8px; }
+.dash-dot { width: 10px; height: 10px; border-radius: 50%; }
+.dash-dot.red { background: #ef4444; }
+.dash-dot.yellow { background: #f59e0b; }
+.dash-dot.green { background: #10b981; }
+.dash-title { font-size: 12px; color: var(--muted); margin-left: 8px; font-weight: 500; }
+.dash-body { padding: 20px; }
+.dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.dash-stat { background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+.dash-stat .num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+.dash-stat .num.b { color: var(--blue-lt); }
+.dash-stat .num.c { color: var(--accent); }
+.dash-stat .num.g { color: var(--green); }
+.dash-stat .lbl { font-size: 10px; color: var(--muted); margin-top: 3px; }
+.dash-workers-label { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.dash-worker-row { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 10px; margin-bottom: 8px; border: 1px solid var(--border); }
+.dash-wr-av { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; }
+.dash-wr-name { font-size: 12px; font-weight: 600; color: white; }
+.dash-wr-role { font-size: 10px; color: var(--muted); }
+.dash-wr-stars { font-size: 10px; color: var(--gold); margin-left: auto; }
+
+/* ── CTA BANNER ── */
+.cta-banner { background: linear-gradient(135deg, #07101e, #0b1527); padding: 100px 0; position: relative; overflow: hidden; border-top: 1px solid var(--border); }
+.cta-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 700px 500px at 30% 50%, rgba(26,86,219,0.2) 0%, transparent 70%), radial-gradient(ellipse 500px 400px at 80% 50%, rgba(6,182,212,0.12) 0%, transparent 70%); pointer-events: none; }
+.cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 40px; flex-wrap: wrap; position: relative; z-index: 1; }
+.cta-text h2 { font-family: 'Syne', sans-serif; font-size: clamp(30px, 4vw, 44px); color: white; margin-bottom: 10px; font-weight: 800; letter-spacing: -1.5px; }
+.cta-text p { font-size: 16px; color: var(--muted); }
+.cta-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Animated counter */
+.cta-mini-stats { display: flex; gap: 36px; margin-top: 28px; }
+.cta-mini-stat .num { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--accent); }
+.cta-mini-stat .lbl { font-size: 12px; color: var(--muted); }
+
+/* ── FOOTER ── */
+.footer { background: #030507; padding: 64px 0 0; border-top: 1px solid var(--border); }
+.footer-inner { display: flex; gap: 64px; flex-wrap: wrap; padding-bottom: 48px; border-bottom: 1px solid var(--border); }
+.footer-brand { flex: 1.5; min-width: 200px; }
+.footer-logo { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 800; color: white; margin-bottom: 14px; letter-spacing: -0.5px; }
+.footer-logo span { color: var(--accent); }
+.footer-brand p { font-size: 14px; color: rgba(255,255,255,0.3); line-height: 1.85; max-width: 250px; }
+.footer-links { display: flex; gap: 56px; flex-wrap: wrap; }
+.footer-col { display: flex; flex-direction: column; gap: 12px; }
+.footer-col h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.25); margin-bottom: 4px; }
+.footer-col a { font-size: 14px; color: rgba(255,255,255,0.45); transition: color 0.2s; }
+.footer-col a:hover { color: white; }
+.footer-bottom { text-align: center; padding: 22px; font-size: 13px; color: rgba(255,255,255,0.2); }
+
+/* ── SECTION LABELS ── */
+.section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 12px; }
+.section-title { font-family: 'Syne', sans-serif; font-size: clamp(30px, 4vw, 46px); font-weight: 800; line-height: 1.08; letter-spacing: -1.5px; color: white; }
+.section-head { text-align: center; margin-bottom: 60px; }
+
+/* ── REVEAL ── */
+.reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1050px) {
+  .immersive-inner { flex-direction: column; }
+  .immersive-visual { width: 100%; }
+  .showcase-grid { grid-template-columns: 1fr; }
+  .showcase-main { grid-row: auto; }
+}
+@media (max-width: 900px) {
+  .hero-inner { flex-direction: column; text-align: center; padding: 80px 28px 130px; }
+  .hero-desc { margin: 0 auto 36px; }
+  .hero-btns { justify-content: center; }
+  .hero-stats { justify-content: center; }
+  .hero-visual { margin-top: 24px; }
+  .float-badge-1 { right: -24px; top: 10px; font-size: 11px; }
+  .float-badge-2 { right: -24px; }
+  .float-badge-3 { left: -24px; }
+  .steps { flex-direction: column; }
+  .step:first-child { border-radius: 20px 20px 0 0; }
+  .step:last-child { border-radius: 0 0 20px 20px; }
+  .step-connector { display: none; }
+  .cta-inner { text-align: center; justify-content: center; }
+  .trust-numbers { flex-wrap: wrap; gap: 0; }
+  .trust-num-item { padding: 16px 28px; }
+}
+@media (max-width: 600px) {
+  .hero-title { letter-spacing: -1px; }
+  .phone-mockup { transform: scale(0.88); transform-origin: center top; }
+  .float-badge { display: none; }
+  .footer-inner { flex-direction: column; gap: 36px; }
+  .footer-links { gap: 28px; }
+  .trust-num-item { border-right: none; border-bottom: 1px solid var(--border); padding: 20px 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">Fix<span>Work</span></div>
+    <div class="nav-links">
+      <a href="#showcase">Platform</a>
+      <a href="#features">Features</a>
+      <a href="#how">How It Works</a>
+      <a href="#testimonials">Reviews</a>
+    </div>
+    <div class="nav-actions">
+      <a href="login.html" class="btn-ghost">Login</a>
+      <a href="signup.html" class="btn-solid">Get Started →</a>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">&#9776;</button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#showcase" onclick="toggleMenu()">Platform</a>
+    <a href="#features" onclick="toggleMenu()">Features</a>
+    <a href="#how" onclick="toggleMenu()">How It Works</a>
+    <a href="#testimonials" onclick="toggleMenu()">Reviews</a>
+    <a href="login.html" class="btn-ghost">Login</a>
+    <a href="signup.html" class="btn-solid">Get Started</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-badge">🇺🇬 Built for Uganda &nbsp;·&nbsp; 100% Free</div>
+      <h1 class="hero-title">
+        Find Skilled<br>
+        <span class="highlight">
+          <span class="type-cycle" id="typeCycle">
+            <span class="word active">Workers</span>
+            <span class="word">Plumbers</span>
+            <span class="word">Electricians</span>
+            <span class="word">Carpenters</span>
+            <span class="word">Mechanics</span>
+          </span>
+        </span><br>
+        Near You
+      </h1>
+      <p class="hero-desc">
+        FixWork connects you with trusted, verified professionals in your
+        neighbourhood — plumbers, electricians, carpenters and more — fast.
+      </p>
+      <div class="hero-btns">
+        <a href="signup.html" class="btn-primary">Find a Worker →</a>
+        <a href="signup.html?role=worker" class="btn-secondary">Join as a Worker</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num count-up" data-target="500">0</span><span>+</span><p>Workers</p></div>
+        <div class="stat-div"></div>
+        <div class="stat"><span class="stat-num count-up" data-target="1200">0</span><span>+</span><p>Jobs Done</p></div>
+        <div class="stat-div"></div>
+        <div class="stat"><span class="stat-num count-up" data-target="98">0</span><span>%</span><p>Satisfied</p></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="phone-mockup">
+        <div class="phone-screen">
+          <div class="phone-topbar">
+            <span class="phone-logo">FixWork</span>
+            <span class="phone-notif">🔔</span>
+          </div>
+          <div class="phone-search">
+            <span>🔍</span> Search for a worker…
+          </div>
+          <div class="phone-cards">
+            <div class="phone-card">
+              <div class="phone-avatar" style="background:#1a56db;">DK</div>
+              <div class="phone-info">
+                <strong>David K.</strong>
+                <span>Plumber · Kampala</span>
+              </div>
+              <div class="phone-stars">★★★★★</div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-avatar" style="background:#059669;">GN</div>
+              <div class="phone-info">
+                <strong>Grace N.</strong>
+                <span>Electrician · Ntinda</span>
+              </div>
+              <div class="phone-stars">★★★★★</div>
+            </div>
+            <div class="phone-card">
+              <div class="phone-avatar" style="background:#7c3aed;">RS</div>
+              <div class="phone-info">
+                <strong>Robert S.</strong>
+                <span>Carpenter · Wakiso</span>
+              </div>
+              <div class="phone-stars">★★★★☆</div>
+            </div>
+          </div>
+          <div class="phone-cta">📩 Contact Worker</div>
+        </div>
+        <div class="float-badge float-badge-1">✅ Job Completed!</div>
+        <div class="float-badge float-badge-2">⭐ 4.9 Avg Rating</div>
+        <div class="float-badge float-badge-3">🔧 200+ Skills</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#0b1120"/>
+    </svg>
+  </div>
+</section>
+
+<!-- SCROLL TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-inner" id="ticker">
+    <span class="ticker-item">✅ Trusted Workers <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🔧 Plumbing & Electrical <span class="ticker-dot"></span></span>
+    <span class="ticker-item">⭐ Verified Reviews <span class="ticker-dot"></span></span>
+    <span class="ticker-item">📍 Local First · Uganda <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🆓 Free to Use <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🪵 Carpentry & Painting <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🚗 Auto Mechanics <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🧹 House Cleaning <span class="ticker-dot"></span></span>
+    <span class="ticker-item">📩 Direct Contact <span class="ticker-dot"></span></span>
+    <span class="ticker-item">✅ Trusted Workers <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🔧 Plumbing & Electrical <span class="ticker-dot"></span></span>
+    <span class="ticker-item">⭐ Verified Reviews <span class="ticker-dot"></span></span>
+    <span class="ticker-item">📍 Local First · Uganda <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🆓 Free to Use <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🪵 Carpentry & Painting <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🚗 Auto Mechanics <span class="ticker-dot"></span></span>
+    <span class="ticker-item">🧹 House Cleaning <span class="ticker-dot"></span></span>
+    <span class="ticker-item">📩 Direct Contact <span class="ticker-dot"></span></span>
+  </div>
+</div>
+
+<!-- TRUST BAR -->
+<div class="trust-bar">
+  <div class="container">
+    <p class="section-label" style="text-align:center;">FixWork in Numbers</p>
+    <div class="trust-numbers">
+      <div class="trust-num-item reveal">
+        <div class="trust-big blue count-up" data-target="500">0</div>
+        <div class="trust-label">Registered Workers</div>
+      </div>
+      <div class="trust-num-item reveal">
+        <div class="trust-big cyan count-up" data-target="1200">0</div>
+        <div class="trust-label">Jobs Completed</div>
+      </div>
+      <div class="trust-num-item reveal">
+        <div class="trust-big gold count-up" data-target="8">0</div>
+        <div class="trust-label">Skill Categories</div>
+      </div>
+      <div class="trust-num-item reveal">
+        <div class="trust-big green count-up" data-target="98">0</div>
+        <div class="trust-label">% Satisfaction Rate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="categories">
+  <div class="container">
+    <p class="section-label" style="text-align:center;">Browse by Category</p>
+    <div class="cat-grid">
+      <div class="cat-item"><div class="cat-icon">🔧</div><span>Plumber</span></div>
+      <div class="cat-item"><div class="cat-icon">⚡</div><span>Electrician</span></div>
+      <div class="cat-item"><div class="cat-icon">🪵</div><span>Carpenter</span></div>
+      <div class="cat-item"><div class="cat-icon">🎨</div><span>Painter</span></div>
+      <div class="cat-item"><div class="cat-icon">🚗</div><span>Mechanic</span></div>
+      <div class="cat-item"><div class="cat-icon">🧹</div><span>Cleaner</span></div>
+      <div class="cat-item"><div class="cat-icon">🧱</div><span>Mason</span></div>
+      <div class="cat-item"><div class="cat-icon">🔩</div><span>Welder</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- VISUAL SHOWCASE -->
+<section class="showcase" id="showcase">
+  <div class="container">
+    <div class="section-head">
+      <p class="section-label">The Platform</p>
+      <h2 class="section-title">Everything in one place</h2>
+      <p style="color:var(--muted);font-size:16px;margin-top:14px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.75;">Browse worker profiles, read reviews, and send job requests — all without leaving FixWork.</p>
+    </div>
+    <div class="showcase-grid">
+
+      <!-- Main card: worker listings -->
+      <div class="showcase-main reveal">
+        <div class="bg-visual"></div>
+        <div class="showcase-worker-cards">
+          <div class="sw-card">
+            <div class="sw-av" style="background:linear-gradient(135deg,#1a56db,#06b6d4);">DK</div>
+            <div class="sw-info">
+              <strong>David Kato</strong>
+              <span>🔧 Plumber · Kampala</span>
+            </div>
+            <div>
+              <div class="sw-rating">★★★★★ 4.9</div>
+              <div class="sw-badge">Available</div>
+            </div>
+          </div>
+          <div class="sw-card">
+            <div class="sw-av" style="background:linear-gradient(135deg,#059669,#10b981);">GN</div>
+            <div class="sw-info">
+              <strong>Grace Namukasa</strong>
+              <span>⚡ Electrician · Ntinda</span>
+            </div>
+            <div>
+              <div class="sw-rating">★★★★★ 5.0</div>
+              <div class="sw-badge">Available</div>
+            </div>
+          </div>
+          <div class="sw-card">
+            <div class="sw-av" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">RS</div>
+            <div class="sw-info">
+              <strong>Robert Ssemakula</strong>
+              <span>🪵 Carpenter · Wakiso</span>
+            </div>
+            <div>
+              <div class="sw-rating">★★★★☆ 4.6</div>
+              <div class="sw-badge">Available</div>
+            </div>
+          </div>
+          <div class="sw-card">
+            <div class="sw-av" style="background:linear-gradient(135deg,#b45309,#f59e0b);">IM</div>
+            <div class="sw-info">
+              <strong>Isaac Muwanguzi</strong>
+              <span>🚗 Mechanic · Ndeeba</span>
+            </div>
+            <div>
+              <div class="sw-rating">★★★★☆ 4.4</div>
+              <div class="sw-badge">Available</div>
+            </div>
+          </div>
+        </div>
+        <div class="showcase-label">
+          <h3>Discover Top Workers</h3>
+          <p>Browse verified profiles with real ratings from real clients</p>
+        </div>
+      </div>
+
+      <!-- Small card: Instant Contact -->
+      <div class="showcase-small sc-dark reveal" style="animation-delay:0.1s">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 250px 200px at 80% 20%, rgba(26,86,219,0.25) 0%, transparent 70%);"></div>
+        <div style="position:relative;z-index:1;">
+          <div class="sc-icon">📩</div>
+          <div class="sc-title">Instant Contact</div>
+          <div class="sc-sub">Send a job request directly to any worker. Get called back fast.</div>
+        </div>
+        <div style="position:relative;z-index:1;display:flex;align-items:center;gap:10px;">
+          <div style="background:rgba(26,86,219,0.15);border:1px solid rgba(26,86,219,0.3);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--accent);font-weight:600;">Send Request →</div>
+          <div style="font-size:12px;color:var(--muted);">Avg. reply: <strong style="color:white;">~15 min</strong></div>
+        </div>
+      </div>
+
+      <!-- Small card: Live activity -->
+      <div class="showcase-small sc-teal reveal" style="animation-delay:0.15s">
+        <div style="position:absolute;inset:0;background:radial-gradient(ellipse 250px 200px at 20% 80%, rgba(6,182,212,0.2) 0%, transparent 70%);"></div>
+        <div style="position:relative;z-index:1;">
+          <div class="sc-icon">🔴</div>
+          <div class="sc-title">Live Activity</div>
+        </div>
+        <div class="mini-feed" style="position:relative;z-index:1;">
+          <div class="mini-feed-item"><div class="mini-feed-dot" style="background:#10b981;"></div>Grace N. completed a job in Ntinda</div>
+          <div class="mini-feed-item"><div class="mini-feed-dot" style="background:#3b82f6;"></div>David K. received a 5-star review</div>
+          <div class="mini-feed-item"><div class="mini-feed-dot" style="background:#f59e0b;"></div>3 new workers joined today</div>
+          <div class="mini-feed-item"><div class="mini-feed-dot" style="background:#8b5cf6;"></div>Robert S. shared new work photos</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="how-bg"></div>
+  <div class="container how-inner">
+    <div class="section-head">
+      <p class="section-label" style="color:#93c5fd;">How It Works</p>
+      <h2 class="section-title" style="color:white;">Three simple steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">01</div>
+        <div class="step-icon">📝</div>
+        <div class="step-body">
+          <h3>Sign Up Free</h3>
+          <p>Create your account in seconds. Choose whether you're a client looking for help or a worker offering services.</p>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step reveal" style="animation-delay:0.1s">
+        <div class="step-num">02</div>
+        <div class="step-icon">🔍</div>
+        <div class="step-body">
+          <h3>Search & Compare</h3>
+          <p>Browse worker profiles, check skills, read real reviews, and filter by category or location to find your perfect match.</p>
+        </div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step reveal" style="animation-delay:0.2s">
+        <div class="step-num">03</div>
+        <div class="step-icon">🤝</div>
+        <div class="step-body">
+          <h3>Contact & Get It Done</h3>
+          <p>Send a direct job request. They contact you, agree on a price, and get the job done. Leave a review when complete.</p>
+        </div>
+      </div>
+    </div>
+    <div class="how-cta">
+      <a href="signup.html" class="btn-primary">Start Now — It's Free</a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-head">
+      <p class="section-label">Why FixWork</p>
+      <h2 class="section-title">Everything you need<br>in one platform</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon" style="background:rgba(59,130,246,0.12);">🔍</div>
+        <h3>Search & Filter</h3>
+        <p>Find workers by skill, category, or location. Browse profiles and compare ratings before you decide.</p>
+      </div>
+      <div class="feature-card reveal" style="animation-delay:0.08s">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.12);">⭐</div>
+        <h3>Verified Reviews</h3>
+        <p>Every worker has real reviews from real clients. Star ratings and written feedback you can trust.</p>
+      </div>
+      <div class="feature-card reveal" style="animation-delay:0.16s">
+        <div class="feature-icon" style="background:rgba(6,182,212,0.12);">📩</div>
+        <h3>Direct Contact</h3>
+        <p>Send a job request directly to any worker. Describe your task, share your phone, and get a call back fast.</p>
+      </div>
+      <div class="feature-card reveal" style="animation-delay:0.24s">
+        <div class="feature-icon" style="background:rgba(139,92,246,0.12);">🪪</div>
+        <h3>Worker Profiles</h3>
+        <p>Workers showcase their bio, skills, photos, and work history — so you know exactly who you're hiring.</p>
+      </div>
+      <div class="feature-card reveal" style="animation-delay:0.32s">
+        <div class="feature-icon" style="background:rgba(16,185,129,0.12);">📍</div>
+        <h3>Local First</h3>
+        <p>Built specifically for Uganda. Find workers in your city, town, or even your neighbourhood.</p>
+      </div>
+      <div class="feature-card reveal" style="animation-delay:0.40s">
+        <div class="feature-icon" style="background:rgba(245,158,11,0.12);">🆓</div>
+        <h3>Free to Use</h3>
+        <p>FixWork is completely free for clients. Workers sign up and list their services at no cost.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKER CAROUSEL STRIP -->
+<section class="workers-strip" id="workers">
+  <div class="container">
+    <div class="section-head">
+      <p class="section-label">Our Workers</p>
+      <h2 class="section-title">Meet some of our<br>top professionals</h2>
+    </div>
+  </div>
+  <div class="workers-carousel">
+    <div class="workers-track" id="workersTrack">
+      <!-- Cards duplicated for seamless loop -->
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#1a56db,#06b6d4);">DK</div><div class="wc-name">David Kato</div><div class="wc-role">Plumber</div><div class="wc-loc">📍 Kampala</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">48 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#059669,#10b981);">GN</div><div class="wc-name">Grace Namukasa</div><div class="wc-role">Electrician</div><div class="wc-loc">📍 Ntinda</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">63 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">RS</div><div class="wc-name">Robert Ssemakula</div><div class="wc-role">Carpenter</div><div class="wc-loc">📍 Wakiso</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">31 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#b45309,#f59e0b);">FN</div><div class="wc-name">Fatuma Nalwoga</div><div class="wc-role">House Cleaner</div><div class="wc-loc">📍 Bukoto</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">27 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">IM</div><div class="wc-name">Isaac Muwanguzi</div><div class="wc-role">Mechanic</div><div class="wc-loc">📍 Ndeeba</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">19 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#dc2626,#ef4444);">SA</div><div class="wc-name">Sylvia Apio</div><div class="wc-role">Painter</div><div class="wc-loc">📍 Gulu</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">14 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#0d9488,#14b8a6);">JM</div><div class="wc-name">James Mukasa</div><div class="wc-role">Mason</div><div class="wc-loc">📍 Entebbe</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">22 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#9333ea,#a855f7);">AO</div><div class="wc-name">Alice Owino</div><div class="wc-role">Welder</div><div class="wc-loc">📍 Jinja</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">11 reviews</div></div>
+      <!-- Duplicate set for seamless loop -->
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#1a56db,#06b6d4);">DK</div><div class="wc-name">David Kato</div><div class="wc-role">Plumber</div><div class="wc-loc">📍 Kampala</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">48 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#059669,#10b981);">GN</div><div class="wc-name">Grace Namukasa</div><div class="wc-role">Electrician</div><div class="wc-loc">📍 Ntinda</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">63 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">RS</div><div class="wc-name">Robert Ssemakula</div><div class="wc-role">Carpenter</div><div class="wc-loc">📍 Wakiso</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">31 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#b45309,#f59e0b);">FN</div><div class="wc-name">Fatuma Nalwoga</div><div class="wc-role">House Cleaner</div><div class="wc-loc">📍 Bukoto</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">27 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">IM</div><div class="wc-name">Isaac Muwanguzi</div><div class="wc-role">Mechanic</div><div class="wc-loc">📍 Ndeeba</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">19 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#dc2626,#ef4444);">SA</div><div class="wc-name">Sylvia Apio</div><div class="wc-role">Painter</div><div class="wc-loc">📍 Gulu</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">14 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#0d9488,#14b8a6);">JM</div><div class="wc-name">James Mukasa</div><div class="wc-role">Mason</div><div class="wc-loc">📍 Entebbe</div><div class="wc-stars">★★★★★</div><div class="wc-reviews">22 reviews</div></div>
+      <div class="wc-card"><div class="wc-av" style="background:linear-gradient(135deg,#9333ea,#a855f7);">AO</div><div class="wc-name">Alice Owino</div><div class="wc-role">Welder</div><div class="wc-loc">📍 Jinja</div><div class="wc-stars">★★★★☆</div><div class="wc-reviews">11 reviews</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- IMMERSIVE / ADMIN MOCKUP -->
+<section class="immersive" id="admin-preview">
+  <div class="immersive-bg"></div>
+  <div class="container immersive-inner">
+    <div class="immersive-text reveal">
+      <p class="section-label">Worker Dashboard</p>
+      <h2>Your professional<br>profile — built in<br>minutes</h2>
+      <p>Workers get a fully featured profile page to showcase their skills, post work photos, collect reviews, and receive job requests from clients across Uganda.</p>
+      <div class="immersive-checklist">
+        <div class="check-item"><div class="check-icon">✓</div>Upload photos & videos of your work</div>
+        <div class="check-item"><div class="check-icon">✓</div>Collect verified client reviews & star ratings</div>
+        <div class="check-item"><div class="check-icon">✓</div>Show your skills, bio, and location</div>
+        <div class="check-item"><div class="check-icon">✓</div>Track profile views and job requests</div>
+        <div class="check-item"><div class="check-icon">✓</div>100% free — no monthly fees</div>
+      </div>
+      <a href="signup.html?role=worker" class="btn-primary">Create Your Profile →</a>
+    </div>
+    <div class="immersive-visual reveal" style="animation-delay:0.15s">
+      <div class="dashboard-mockup">
+        <div class="dash-topbar">
+          <div class="dash-dot red"></div>
+          <div class="dash-dot yellow"></div>
+          <div class="dash-dot green"></div>
+          <div class="dash-title">Worker Dashboard · FixWork</div>
+        </div>
+        <div class="dash-body">
+          <div class="dash-stats">
+            <div class="dash-stat"><div class="num b">127</div><div class="lbl">Profile Views</div></div>
+            <div class="dash-stat"><div class="num c">4.9</div><div class="lbl">Avg Rating</div></div>
+            <div class="dash-stat"><div class="num g">18</div><div class="lbl">Reviews</div></div>
+          </div>
+          <div class="dash-workers-label">Top Workers This Week</div>
+          <div class="dash-worker-row">
+            <div class="dash-wr-av" style="background:linear-gradient(135deg,#1a56db,#06b6d4);">DK</div>
+            <div><div class="dash-wr-name">David Kato</div><div class="dash-wr-role">Plumber · Kampala</div></div>
+            <div class="dash-wr-stars">★★★★★</div>
+          </div>
+          <div class="dash-worker-row">
+            <div class="dash-wr-av" style="background:linear-gradient(135deg,#059669,#10b981);">GN</div>
+            <div><div class="dash-wr-name">Grace Namukasa</div><div class="dash-wr-role">Electrician · Ntinda</div></div>
+            <div class="dash-wr-stars">★★★★★</div>
+          </div>
+          <div class="dash-worker-row">
+            <div class="dash-wr-av" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">RS</div>
+            <div><div class="dash-wr-name">Robert Ssemakula</div><div class="dash-wr-role">Carpenter · Wakiso</div></div>
+            <div class="dash-wr-stars">★★★★☆</div>
+          </div>
+          <div style="margin-top:16px;background:linear-gradient(135deg,var(--blue),var(--accent));border-radius:10px;padding:12px;text-align:center;font-size:13px;font-weight:700;color:white;">📩 3 New Job Requests</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="testimonials">
+  <div class="container">
+    <div class="section-head">
+      <p class="section-label">What People Say</p>
+      <h2 class="section-title">Trusted by clients<br>across Uganda</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"I found a plumber within minutes. He fixed our burst pipe the same day. FixWork saved us so much stress and money!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#1a56db;">SK</div>
+          <div><strong>Sarah Kamukama</strong><span>Kampala, Uganda</span></div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="animation-delay:0.08s">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"As an electrician, FixWork has brought me so many clients. My profile looks professional and people trust me more now."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#059669;">JM</div>
+          <div><strong>James Mugisha</strong><span>Electrician · Ntinda</span></div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="animation-delay:0.16s">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">"The carpenter I hired built beautiful kitchen cabinets. I loved that I could read his reviews and see his past work before calling."</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#b45309;">LA</div>
+          <div><strong>Linda Atuhaire</strong><span>Wakiso, Uganda</span></div>
+        </div>
+      </div>
+      <div class="testi-card reveal" style="animation-delay:0.24s">
+        <div class="testi-stars">★★★★☆</div>
+        <p class="testi-text">"FixWork is easy to use even on mobile. I hired a painter and a cleaner in the same week. Great platform for Uganda!"</p>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:#7c3aed;">PO</div>
+          <div><strong>Peter Okello</strong><span>Gulu, Uganda</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="cta-bg"></div>
+  <div class="container cta-inner">
+    <div class="cta-text reveal">
+      <h2>Ready to get started?</h2>
+      <p>Join thousands of Ugandans already using FixWork to find help or grow their business.</p>
+      <div class="cta-mini-stats">
+        <div class="cta-mini-stat"><div class="num">Free</div><div class="lbl">Forever for clients</div></div>
+        <div class="cta-mini-stat"><div class="num">~15min</div><div class="lbl">Avg. response time</div></div>
+        <div class="cta-mini-stat"><div class="num">500+</div><div class="lbl">Active workers</div></div>
+      </div>
+    </div>
+    <div class="cta-btns reveal" style="animation-delay:0.1s">
+      <a href="signup.html" class="btn-primary">Sign Up Free →</a>
+      <a href="login.html" class="btn-ghost-white">I Already Have an Account</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">Fix<span>Work</span></div>
+      <p>Connecting Uganda's skilled workers with people who need them. Built with care in Kampala. 🇺🇬</p>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Platform</h4>
+        <a href="signup.html">Sign Up</a>
+        <a href="login.html">Login</a>
+        <a href="#features">Features</a>
+      </div>
+      <div class="footer-col">
+        <h4>For Workers</h4>
+        <a href="signup.html?role=worker">Join as Worker</a>
+        <a href="#how">How It Works</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contact</h4>
+        <a href="mailto:hello@fixwork.ug">hello@fixwork.ug</a>
+        <a href="#">+256 700 000 000</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 FixWork. Made with ❤️ in Uganda.</p>
+  </div>
+</footer>
+
+<script>
+// ── NAV SCROLL ──────────────────────────────
+window.addEventListener('scroll', function() {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 40);
+});
+
+function toggleMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// ── REVEAL ON SCROLL ──────────────────────────────
+const observer = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(function(el) { observer.observe(el); });
+
+// ── COUNT-UP ANIMATION ──────────────────────────────
+function animateCountUp(el) {
+  const target = parseInt(el.dataset.target);
+  const duration = 1600;
+  const start = performance.now();
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(ease * target);
+    if (progress < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+
+const countObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting && e.target.dataset.target) {
+      animateCountUp(e.target);
+      countObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.4 });
+document.querySelectorAll('.count-up').forEach(function(el) { countObserver.observe(el); });
+
+// ── TYPEWRITER WORD CYCLE ──────────────────────────────
+(function() {
+  const words = document.querySelectorAll('#typeCycle .word');
+  let idx = 0;
+  setInterval(function() {
+    words[idx].classList.remove('active');
+    idx = (idx + 1) % words.length;
+    words[idx].classList.add('active');
+  }, 2000);
+})();
+
+// Word swap animation
+const style = document.createElement('style');
+style.textContent = `
+  .type-cycle .word {
+    display: none; opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s, transform 0.4s;
+  }
+  .type-cycle .word.active {
+    display: inline-block; opacity: 1;
+    transform: translateY(0);
+    animation: wordIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+  }
+  @keyframes wordIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+`;
+document.head.appendChild(style);
+
+// ── PARALLAX BLOBS (SUBTLE) ──────────────────────────────
+document.addEventListener('mousemove', function(e) {
+  const x = (e.clientX / window.innerWidth - 0.5) * 18;
+  const y = (e.clientY / window.innerHeight - 0.5) * 18;
+  const b1 = document.querySelector('.blob-1');
+  const b2 = document.querySelector('.blob-2');
+  if (b1) b1.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+  if (b2) b2.style.transform = 'translate(' + (-x * 0.5) + 'px, ' + (-y * 0.5) + 'px)';
+});
+</script>
+</body>
+</html>

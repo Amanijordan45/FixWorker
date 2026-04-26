@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixWork – Worker Profile</title>
+<link rel="stylesheet" href="worker.css">
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Fix<span style="font-weight:300">Work</span></h1>
+  <span id="topbarGreeting"></span>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="cover" id="coverArea">
+  <button class="cover-edit" onclick="document.getElementById('coverInput').click()">&#9998; Edit Cover</button>
+  <input type="file" id="coverInput" accept="image/*" style="display:none" onchange="handleCoverChange(event)">
+</div>
+
+<div class="profile-container">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="profile-card">
+      <div class="avatar-wrapper">
+        <div class="avatar-initials" id="avatarDisplay"></div>
+        <button class="avatar-edit-btn" onclick="document.getElementById('imageInput').click()">&#9998;</button>
+        <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageChange(event)">
+      </div>
+      <div class="profile-name" id="displayName">Your Name</div>
+      <div class="profile-role" id="displayRole">Worker</div>
+      <div class="profile-location" id="displayLocation" style="display:none">
+        &#128205; <span id="locationText"></span>
+      </div>
+      <button class="edit-profile-btn" onclick="openEditModal()">&#9998; Edit Profile</button>
+    </div>
+
+    <div class="stats-card">
+      <h4>Stats</h4>
+      <div class="stat-row"><span>Profile Views</span><span class="stat-value" id="statViews">0</span></div>
+      <div class="stat-row"><span>Posts</span><span class="stat-value" id="statPosts">0</span></div>
+      <div class="stat-row"><span>Avg Rating</span><span class="stat-value" id="statRating">—</span></div>
+      <div class="stat-row"><span>Reviews</span><span class="stat-value" id="statReviews">0</span></div>
+    </div>
+
+    <div class="skills-card">
+      <h4>Skills</h4>
+      <div class="skills-list" id="skillsList">
+        <span class="no-data">No skills added yet</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-content">
+
+    <div class="section">
+      <div class="section-header">
+        <h3>About Me</h3>
+        <button class="section-btn" onclick="openEditModal()">Edit</button>
+      </div>
+      <p class="bio-text" id="bioDisplay" style="display:none"></p>
+      <p class="bio-placeholder" id="bioPlaceholder">Tell clients about yourself, your experience, and what you do...</p>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><h3>My Work & Posts</h3></div>
+      <div class="post-form">
+        <textarea id="postText" placeholder="Share your work, updates, or photos..."></textarea>
+        <div class="post-actions">
+          <label>
+            <input type="file" id="postMediaInput" accept="image/*,video/*" multiple style="display:none" onchange="previewPostMedia(event)">
+            &#128247; Photo/Video
+          </label>
+          <span id="mediaPreviewCount"></span>
+          <button class="post-submit" onclick="submitPost()">Post</button>
+        </div>
+      </div>
+      <div id="postsFeed">
+        <div class="empty-state">&#128444;<br>No posts yet. Share your work!</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><h3>Client Reviews</h3></div>
+      <div id="ratingSummary" style="display:none">
+        <div class="rating-summary">
+          <div>
+            <div class="rating-big" id="avgRatingBig">0</div>
+            <div class="rating-stars" id="avgStarsDisplay"></div>
+            <div class="rating-count" id="reviewCountText">0 reviews</div>
+          </div>
+          <div class="rating-bars" id="ratingBars"></div>
+        </div>
+      </div>
+      <div id="reviewsList">
+        <div class="empty-state">&#11088;<br>No reviews yet.</div>
+      </div>
+      <div class="rating-form">
+        <h4>Leave a Review</h4>
+        <div class="star-selector" id="starSelector">
+          <button class="star-btn" data-val="1" onclick="selectStar(1)">&#9733;</button>
+          <button class="star-btn" data-val="2" onclick="selectStar(2)">&#9733;</button>
+          <button class="star-btn" data-val="3" onclick="selectStar(3)">&#9733;</button>
+          <button class="star-btn" data-val="4" onclick="selectStar(4)">&#9733;</button>
+          <button class="star-btn" data-val="5" onclick="selectStar(5)">&#9733;</button>
+        </div>
+        <input type="text" id="reviewerName" placeholder="Your name">
+        <textarea id="reviewText" placeholder="Write your review..."></textarea>
+        <button class="submit-rating" onclick="submitRating()">Submit Review</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h3>Edit Profile</h3>
+    <label>Full Name</label>
+    <input type="text" id="editName">
+    <label>Job Title / Role</label>
+    <input type="text" id="editRole" placeholder="e.g. Plumber, Electrician">
+    <label>Bio</label>
+    <textarea id="editBio" placeholder="Tell clients about yourself..."></textarea>
+    <label>Skills (comma separated)</label>
+    <input type="text" id="editSkills" placeholder="e.g. Welding, Carpentry">
+    <label>Location</label>
+    <input type="text" id="editLocation" placeholder="e.g. Kampala, Uganda">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProfile()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="workers.js"></script>
+</body>
+</html>

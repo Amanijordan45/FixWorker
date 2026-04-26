@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixWork – Find Workers</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="client.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+
+<div class="topbar">
+  <div class="topbar-logo">Fix<span>Work</span></div>
+
+  <div class="topbar-right">
+    <div class="notif-container">
+      <span id="notifBell">🔔</span>
+      <span id="notifCount">0</span>
+
+      <div class="notif-dropdown" id="notifDropdown"></div>
+    </div>
+
+    <span class="topbar-greeting" id="topbarGreeting"></span>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+</div>
+<!-- HERO SEARCH -->
+<div class="hero">
+  <div class="hero-content">
+    <h2>Find Trusted Workers Near You</h2>
+    <p>Browse skilled professionals ready to help with your next job</p>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search by name or skill…" oninput="applyFilters()">
+      <select id="categoryFilter" onchange="applyFilters()">
+        <option value="">All Categories</option>
+        <option value="plumber">Plumber</option>
+        <option value="electrician">Electrician</option>
+        <option value="carpenter">Carpenter</option>
+        <option value="painter">Painter</option>
+        <option value="mechanic">Mechanic</option>
+        <option value="cleaner">Cleaner</option>
+        <option value="mason">Mason</option>
+        <option value="welder">Welder</option>
+      </select>
+      <button class="search-btn" onclick="applyFilters()">🔍 Search</button>
+    </div>
+  </div>
+</div>
+
+<!-- FILTERS BAR -->
+<div class="filters-bar">
+  <span class="filter-label">Sort:</span>
+  <button class="filter-chip active" onclick="setSort('default', this)">Newest</button>
+  <button class="filter-chip" onclick="setSort('rating', this)">Top Rated</button>
+  <button class="filter-chip" onclick="setSort('reviews', this)">Most Reviewed</button>
+  <span class="results-count" id="resultsCount"></span>
+</div>
+
+<!-- WORKERS GRID -->
+<div class="main-wrap">
+  <div class="workers-grid" id="workersGrid"></div>
+</div>
+
+<!-- WORKER DETAIL MODAL -->
+<div class="modal-overlay" id="workerModal">
+  <div class="worker-modal" id="workerModalContent">
+    <div class="modal-cover" id="modalCover"></div>
+    <div class="modal-body">
+      <div class="modal-avatar" id="modalAvatar"></div>
+      <div class="modal-name" id="modalName"></div>
+      <div class="modal-role" id="modalRole"></div>
+      <div class="modal-location" id="modalLocation"></div>
+
+      <div class="modal-section-title">About</div>
+      <p class="modal-bio" id="modalBio"></p>
+
+      <div class="modal-section-title">Skills</div>
+      <div class="modal-skills" id="modalSkills"></div>
+
+      <div class="modal-section-title">Reviews</div>
+      <div id="modalRatings"></div>
+
+      <div class="modal-actions">
+        <button class="btn-contact" id="modalContactBtn">📩 Contact This Worker</button>
+        <button class="btn-close-modal" onclick="closeWorkerModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="contactModal">
+  <div class="contact-modal">
+    <h3>📩 Contact Worker</h3>
+    <p id="contactWorkerName">Send a job request</p>
+    <label>Your Name</label>
+    <input type="text" id="contactName" placeholder="Your full name">
+    <label>Your Phone</label>
+    <input type="tel" id="contactPhone" placeholder="+256 700 000 000">
+    <label>Job Type</label>
+    <select id="contactJobType">
+      <option value="">Select job type…</option>
+      <option>Home repair</option>
+      <option>Installation</option>
+      <option>Maintenance</option>
+      <option>Emergency fix</option>
+      <option>New construction</option>
+      <option>Other</option>
+    </select>
+    <label>Message</label>
+    <textarea id="contactMessage" placeholder="Describe what you need done…"></textarea>
+    <div class="contact-actions">
+      <button class="btn-send" onclick="sendContact()">Send Request</button>
+      <button class="btn-cancel" onclick="closeContactModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="client.js"></script>
+</body>
+</html>

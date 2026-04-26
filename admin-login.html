@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FixWork – Founder Access</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg:     #050810;
+  --card:   #0d1117;
+  --border: rgba(255,255,255,0.07);
+  --blue:   #0a66c2;
+  --gold:   #f59e0b;
+  --text:   #e8eaf0;
+  --muted:  #5a6070;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* animated mesh background */
+.bg-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.bg-mesh::before {
+  content:'';
+  position:absolute;
+  width:600px; height:600px;
+  background: radial-gradient(circle, rgba(10,102,194,0.18) 0%, transparent 70%);
+  top:-100px; left:-100px;
+  animation: drift1 12s ease-in-out infinite alternate;
+}
+.bg-mesh::after {
+  content:'';
+  position:absolute;
+  width:500px; height:500px;
+  background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+  bottom:-80px; right:-80px;
+  animation: drift2 10s ease-in-out infinite alternate;
+}
+@keyframes drift1 { to { transform: translate(60px, 80px); } }
+@keyframes drift2 { to { transform: translate(-50px, -60px); } }
+
+/* grid lines */
+.grid-lines {
+  position: fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.card {
+  position: relative;
+  z-index: 10;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 44px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+  animation: appear 0.6s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes appear {
+  from { opacity:0; transform:translateY(30px) scale(0.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  color: white;
+  margin-bottom: 6px;
+  letter-spacing: -1px;
+}
+.logo span { color: var(--blue); }
+
+.subtitle {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 36px;
+  font-weight: 400;
+}
+
+.field { margin-bottom: 18px; }
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+.field input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 16px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+.field input:focus {
+  border-color: var(--blue);
+  background: rgba(10,102,194,0.06);
+}
+
+.hint {
+  font-size: 12px;
+  color: rgba(245,158,11,0.7);
+  margin-top: 6px;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-top: 8px;
+  letter-spacing: 0.2px;
+}
+.btn-login:hover { background: #0857a8; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(10,102,194,0.35); }
+.btn-login:active { transform: translateY(0); }
+
+.error {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #fca5a5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-top: 14px;
+  display: none;
+}
+.error.show { display: block; }
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--text); }
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 28px 0;
+}
+
+.security-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.security-note span { font-size: 16px; }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="grid-lines"></div>
+
+<div class="card">
+  <div class="badge">🔐 Founder Access Only</div>
+  <div class="logo">Fix<span>Work</span></div>
+  <p class="subtitle">Admin Control Panel — restricted access</p>
+
+  <div class="field">
+    <label>Admin Email</label>
+    <input type="email" id="adminEmail" placeholder="founder@fixwork.ug" autocomplete="off">
+  </div>
+  <div class="field">
+    <label>Password</label>
+    <input type="password" id="adminPass" placeholder="••••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <p class="hint">⚠ Default: admin@fixwork.ug / founder2025</p>
+  </div>
+
+  <button class="btn-login" onclick="doLogin()">Access Dashboard →</button>
+  <div class="error" id="errMsg">❌ Invalid credentials. Access denied.</div>
+
+  <hr class="divider">
+  <div class="security-note">
+    <span>🛡</span>
+    <span>This panel is for the FixWork founder only. All actions are logged.</span>
+  </div>
+
+  <a href="index.html" class="back-link">← Back to FixWork</a>
+</div>
+
+<script>
+// Founder credentials — change these to your own
+const ADMIN_EMAIL    = 'admin@fixwork.ug';
+const ADMIN_PASSWORD = 'founder2025';
+
+function doLogin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass  = document.getElementById('adminPass').value.trim();
+  const err   = document.getElementById('errMsg');
+
+  if (email === ADMIN_EMAIL && pass === ADMIN_PASSWORD) {
+    localStorage.setItem('fixwork_admin_session', 'true');
+    window.location.href = 'admin.html';
+  } else {
+    err.classList.add('show');
+    document.getElementById('adminPass').value = '';
+    setTimeout(function() { err.classList.remove('show'); }, 4000);
+  }
+}
+</script>
+</body>
+</html>

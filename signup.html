@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixWork - Sign Up</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="login-container">
+
+    <!-- Logo -->
+    <div class="logo">
+        <h1>Fix<span>Work</span></h1>
+        <p>Create your account</p>
+    </div>
+
+    <!-- Form -->
+    <form id="signupForm" class="form">
+
+        <div class="input-group">
+            <input type="text" required>
+            <label>Full Name</label>
+        </div>
+
+        <div class="input-group">
+            <input type="email" required>
+            <label>Email</label>
+        </div>
+
+        <div class="input-group">
+            <input type="password" required>
+            <label>Password</label>
+        </div>
+
+        <!-- Role Selection -->
+        <div class="role-select">
+            <label>I am a:</label>
+            <select required>
+                <option value="">Select role</option>
+                <option value="client">Client</option>
+                <option value="worker">Worker</option>
+            </select>
+        </div>
+
+        <button type="submit">Create Account</button>
+
+        <p class="link">
+            Already have an account?
+            <a href="login.html">Login</a>
+        </p>
+    </form>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
